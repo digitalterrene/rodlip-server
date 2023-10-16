@@ -1,0 +1,3 @@
+# Ignore files in the src directory
+src/node_modules/
+src/.env
