@@ -5,7 +5,7 @@ require("dotenv").config();
 const cors = require("cors");
 // Configure CORS to allow requests from vertueal.com and localhost:3000
 const corsOptions = {
-  origin: ["https://users.rodlip.org", "http://localhost:3000"],
+  origin: ["https://registry.rodlip.org", "http://localhost:3000"],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true, // Allow cookies and HTTP authentication
   optionsSuccessStatus: 204, // No Content response for preflight requests
