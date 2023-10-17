@@ -45,7 +45,7 @@ const registerUser = async (req, res) => {
         const token = createToken(user._id);
         const res_user = { token, ...user._doc };
         //removing the password from the response obj
-        delete res_user._id;
+        delete res_user.password;
         res.status(200).json(res_user);
       }
     } catch (error) {
@@ -70,7 +70,7 @@ const loginUser = async (req, res) => {
     res.status(400).json({ error: "Password is required" });
   } else {
     try {
-      const user = await entitiesModel.findOne({ email });
+      const user = await usersModel.findOne({ email });
       if (!user) {
         res.status(400).json({ error: "Email does not exist" });
       }
@@ -81,7 +81,10 @@ const loginUser = async (req, res) => {
           res.status(400).json({ error: "Wrong password" });
         }
         if (validity) {
-          res.status(200).json({ ...user, token });
+          const res_user = { token, ...user._doc };
+          //removing the password from the response obj
+          delete res_user.password;
+          res.status(200).json(res_user);
         }
       }
     } catch (error) {
@@ -91,7 +94,15 @@ const loginUser = async (req, res) => {
 };
 
 const fetchUser = async (req, res) => {
-  const { id, token } = req.params;
+  const { id } = req.params;
+  const auth_header = req.headers.authorization;
+
+  if (!auth_header || !auth_header.startsWith("Bearer ")) {
+    res.status(400).json({ error: "Access denied. No auth token provided" });
+    return;
+  }
+
+  const token = auth_header.split(" ")[1];
   const decoded = verifyToken(token);
   if (!decoded) {
     res.status(400).json({ error: "Access denied. Invalid auth token" });
@@ -102,10 +113,9 @@ const fetchUser = async (req, res) => {
     const user = await usersModel.findById(id);
     if (!user) {
       res.status(400).json({ error: "User does not exist" });
+      return;
     }
-    if (user) {
-      res.status(200).json(user);
-    }
+    res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -113,8 +123,23 @@ const fetchUser = async (req, res) => {
 
 //update user
 const updateUser = async (req, res) => {
-  const { id, token } = req.params;
+  const { id } = req.params;
   const { password, email } = req.body;
+  const auth_header = req.headers.authorization;
+
+  //checking token availability and registing requests with no token
+  if (!auth_header || !auth_header.startsWith("Bearer ")) {
+    res.status(400).json({ error: "Access denied. No auth token provided" });
+    return;
+  }
+  const token = auth_header.split(" ")[1];
+  const decoded = verifyToken(token);
+  if (!decoded) {
+    res.status(400).json({ error: "Access denied. Invalid auth token" });
+    return;
+  }
+
+  //verifying the email and password validity
   if (email && !validator.isEmail(email)) {
     return res
       .status(400)
@@ -125,12 +150,8 @@ const updateUser = async (req, res) => {
       .status(400)
       .json({ error: "Weak password, please provide a stronger one!" });
   }
-  const decoded = verifyToken(token);
-  if (!decoded) {
-    res.status(400).json({ error: "Access denied. Invalid auth token" });
-    return;
-  }
 
+  //processing the put request to the database
   try {
     if (password) {
       const salt = await bcrypt.genSalt(10);
