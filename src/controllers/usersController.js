@@ -39,12 +39,10 @@ const registerUser = async (req, res) => {
     try {
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(password, salt);
-      const user = await usersModel.create({
-        email,
-        password: hash,
-      });
+      req.body.password = hash;
+      const user = await usersModel.create(req.body);
       if (user) {
-        const token = createToken(entity._id);
+        const token = createToken(user._id);
         res.status(200).json({ ...user, token });
       }
     } catch (error) {

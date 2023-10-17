@@ -18,7 +18,7 @@ app.use(cors());
 app.use(bodyParser.json({ limit: "1000mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "1000mb", extended: true }));
 
-app.use("/entities", usersRoutes);
+app.use("/users", usersRoutes);
 //configuring mongoose
 mongoose.set("strictQuery", true);
 //connecting the database and starting the app
