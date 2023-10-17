@@ -179,10 +179,9 @@ const updateUser = async (req, res) => {
 };
 // /api/user?search=piyush
 const searchUsers = async (req, res) => {
-  const { searchKey, skip, limit } = req.params;
-
+  const { search_key, skip, limit } = req.params;
   try {
-    if (searchKey === "allFields") {
+    if (search_key === "allFields") {
       const users = await usersModel
         .find({
           $or: [
@@ -207,7 +206,7 @@ const searchUsers = async (req, res) => {
         .find({
           $or: [
             {
-              [searchKey]: { $regex: req.body.key_value, $options: "i" },
+              [search_key]: { $regex: req.body.key_value, $options: "i" },
             },
           ],
         })
@@ -240,6 +239,19 @@ const fetchAllUsers = async (req, res) => {
 //deleting a user
 const deleteUser = async (req, res) => {
   const { id } = req.params;
+  const auth_header = req.headers.authorization;
+  //checking token availability and registing requests with no token
+  if (!auth_header || !auth_header.startsWith("Bearer ")) {
+    res.status(400).json({ error: "Access denied. No auth token provided" });
+    return;
+  }
+  const token = auth_header.split(" ")[1];
+  const decoded = verifyToken(token);
+  if (!decoded) {
+    res.status(400).json({ error: "Access denied. Invalid auth token" });
+    return;
+  }
+
   try {
     await usersModel.findByIdAndDelete(id);
   } catch (error) {

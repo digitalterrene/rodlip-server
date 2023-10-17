@@ -29,6 +29,7 @@ const userSchema = new Schema(
     country: String,
     gender: String,
     city: String,
+    generation: String,
     description: String,
     postal_code: String,
     profession: String,
