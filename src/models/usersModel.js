@@ -21,6 +21,7 @@ const userSchema = new Schema(
     whatsapp: String,
     twitter: String,
     mobile: String,
+    race: String,
     banner: String,
     image: String,
     address: String,

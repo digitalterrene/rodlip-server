@@ -186,13 +186,13 @@ const searchUsers = async (req, res) => {
         .find({
           $or: [
             {
-              name: { $regex: req.body.key_value, $options: "i" },
+              name: { $regex: req.body.search_value, $options: "i" },
             },
             {
-              surname: { $regex: req.body.key_value, $options: "i" },
+              surname: { $regex: req.body.search_value, $options: "i" },
             },
             {
-              username: { $regex: req.body.key_value, $options: "i" },
+              username: { $regex: req.body.search_value, $options: "i" },
             },
           ],
         })
@@ -206,7 +206,7 @@ const searchUsers = async (req, res) => {
         .find({
           $or: [
             {
-              [search_key]: { $regex: req.body.key_value, $options: "i" },
+              [search_key]: { $regex: req.body.search_value, $options: "i" },
             },
           ],
         })
