@@ -17,8 +17,8 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/:id", fetchUser);
 router.get("/", fetchAllUsers);
-router.get("/search/:searchKey/:token", searchUsers);
-router.put("/:id/:token", updateUser);
+router.get("/search/:search_key", searchUsers);
+router.put("/:id", updateUser);
 router.delete("/:id", deleteUser);
 // Updating an cubical
 
