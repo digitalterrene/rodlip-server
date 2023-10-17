@@ -43,7 +43,10 @@ const registerUser = async (req, res) => {
       const user = await usersModel.create(req.body);
       if (user) {
         const token = createToken(user._id);
-        res.status(200).json({ ...user, token });
+        const res_user = { token, ...user._doc };
+        //removing the password from the response obj
+        delete res_user._id;
+        res.status(200).json(res_user);
       }
     } catch (error) {
       if (
